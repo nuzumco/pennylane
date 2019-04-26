@@ -348,6 +348,25 @@ class QNode:
         #: dict[int->str]: map from free parameter index to the gradient method to be used with that parameter
         self.grad_method_for_par = {k: self._best_method(k) for k in self.variable_ops}
 
+        # create subcircuits for each parameter.
+        # if the parameter appears in a gate G, the subcircuit contains 
+        # all gates which precede G, and G is replaced by its generator
+        self.subcircuits = {}
+        # iterate over all parameters
+        for param_idx, gate_param_tuple in self.variable_ops.items():
+            # iterate over gates where this param is used
+            for op_idx, op_param_idx in gate_param_tuple:
+                # Note: op_param_index might not be needed unless 
+                # we are looking at multi-param gate
+                precursor_circuit = self.ops[:op_idx]
+                curr_op = self.ops[op_idx]
+                gen = curr_op.generator
+                wires = curr_op._wires
+                expval_op = gen(wires, do_queue=False)
+                precursor_circuit.append(expval_op)
+                self.subcircuits["param{}".format(param_idx)] = precursor_circuit
+
+
     def _op_successors(self, o_idx, only='G'):
         """Successors of the given operation in the quantum circuit.
 

@@ -56,6 +56,9 @@ Code details
 """
 
 from pennylane.operation import Operation
+from pennylane.expval import PauliX as PauliX_expval, \
+                             PauliY as PauliY_expval, \
+                             PauliZ as PauliZ_expval
 
 
 class Hadamard(Operation):
@@ -158,6 +161,7 @@ class CNOT(Operation):
     num_params = 0
     num_wires = 2
     par_domain = None
+    generator = None
 
 
 class CZ(Operation):
@@ -235,6 +239,7 @@ class RX(Operation):
     num_wires = 1
     par_domain = 'R'
     grad_method = 'A'
+    generator = PauliX_expval
 
 
 class RY(Operation):
@@ -260,6 +265,7 @@ class RY(Operation):
     num_wires = 1
     par_domain = 'R'
     grad_method = 'A'
+    generator = PauliY_expval
 
 
 class RZ(Operation):
@@ -285,6 +291,7 @@ class RZ(Operation):
     num_wires = 1
     par_domain = 'R'
     grad_method = 'A'
+    generator = PauliZ_expval
 
 
 class PhaseShift(Operation):
